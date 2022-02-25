@@ -1,3 +1,3 @@
 #!/bin/sh
 
-scp -r ../main.py ../paulacam.py ../lib ../resources pi@raspberrypi:~/paulacam/
+scp -r ../main.py ../paulacam.py ../lib ../resources ../pics pi@raspberrypi:~/paulacam/

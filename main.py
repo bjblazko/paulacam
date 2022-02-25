@@ -1,8 +1,11 @@
 import glob
+import logging
 import os
 import time
 
 # pip3 install Pillow (tested w/ 9.0.1)
+import uuid
+
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -11,6 +14,9 @@ import lib.ColorOled128 as Oled
 from lib.RotaryEncoder import RotaryEncoder
 
 # https://picamera.readthedocs.io/en/release-1.13/install.html
+
+__photo_folder = './pics'
+
 __displayCounter = 0
 __photo_list = list
 
@@ -20,19 +26,19 @@ def read_photos():
     global __photo_list
     __photo_list = glob.glob("*.jpeg")
     print(f'Fetched {__photo_list.__sizeof__()}')
-    #for i in __photo_list:
-        #print(__photo_list[i])
+    # for i in __photo_list:
+    # print(__photo_list[i])
+
 
 def trigger_pressed(channel):
     print(f'------> Detected {channel}')
-    photo_name = f'img-{time.time()}'
-    image = __take_photo(photo_name)
-    read_photos()
+    image = __take_photo()
     __show_photo(image)
+    #read_photos()
 
 
-def __take_photo(name):
-    filename = f'{name}.jpeg'
+def __take_photo():
+    filename = __new_photo_filename_and_index()
     cmdline = f'''
     libcamera-still \
     --camera 0 \
@@ -40,10 +46,10 @@ def __take_photo(name):
     --immediate \
     --nopreview
     '''
-    exec_result = os.system(cmdline)
-    # print(exec_result)
+    os.system(cmdline)
+
+    time.sleep(2)
     print(f'Saving picture to {filename}')
-    time.sleep(1)
     return Image.open(filename)
 
 
@@ -68,6 +74,17 @@ def rotate_left():
 
 def rotate_right():
     print("Right")
+
+
+# TODO: use shelve
+def __new_photo_filename_and_index():
+    photofile = f'img-{uuid.uuid4()}.jpg'
+    photofile_full = f'{__photo_folder}/{photofile}'
+    indexfile = f'{__photo_folder}/_index.txt'
+    print(f'Opening index file: {indexfile}')
+    with open(indexfile, mode='a') as f:
+        f.write(f'{photofile}\n')
+        return photofile_full
 
 
 if __name__ == '__main__':
