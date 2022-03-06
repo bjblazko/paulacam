@@ -1,0 +1,23 @@
+{
+  "name": "paulacam",
+  "version": "1.0.0",
+  "description": "Paula Raspi camera",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bjblazko/paulacam.git"
+  },
+  "author": "Timo Böwing",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/bjblazko/paulacam/issues"
+  },
+  "homepage": "https://github.com/bjblazko/paulacam#readme",
+  "dependencies": {
+    "onoff": "6.0.3",
+    "ssd1351": "^2.0.0"
+  }
+}
