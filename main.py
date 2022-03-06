@@ -44,7 +44,8 @@ def __take_photo():
     --camera 0 \
     --output {filename} \
     --immediate \
-    --nopreview
+    --nopreview \
+    --timeout 1 \
     '''
     os.system(cmdline)
 
