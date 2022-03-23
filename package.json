@@ -17,7 +17,11 @@
   },
   "homepage": "https://github.com/bjblazko/paulacam#readme",
   "dependencies": {
+    "jimp": "^0.16.1",
+    "nodary-encoder": "^0.1.4",
     "onoff": "6.0.3",
+    "rpi-gpio-buttons": "^2.0.1",
+    "scattered-store": "^1.0.1",
     "ssd1351": "^2.0.0"
   }
 }
