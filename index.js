@@ -2,20 +2,21 @@
 
 console.log('PaulaCam starting...')
 
-const jimp = require('jimp')
+const sharp = require('sharp')
+
+const {execSync} = require("child_process")
 
 const GpioButtons = require('rpi-gpio-buttons')
-const ScatteredStore = require('scattered-store')
+let buttons = new GpioButtons({pins: [27]})
 
+const ScatteredStore = require('scattered-store')
 const store = ScatteredStore.create('./data', (err) => {
     if (err) {
-        // Oops! Something went wrong.
-    } else {
-        // Initialization done!
+        console.log('Failed to setup persistent image counter')
     }
 })
 
-let buttons = new GpioButtons({pins: [27]})
+
 
 buttons.on('clicked', pin => {
     triggerPressed().then(r => {
@@ -23,16 +24,20 @@ buttons.on('clicked', pin => {
     })
 })
 
+
+
 async function triggerPressed() {
     increaseCounterAndGet().then(counter => {
         let counterFormatted = (counter).toString().padStart(7, '0')
         const filename = `./pics/photo-${counterFormatted}.jpeg`
         console.log(`Taking photo ${filename}`)
         takePhoto(filename)
-        // thumbnail(filename, `./thumbs/thumb-${counterFormatted}.jpeg`)
+        thumbnail(filename, `./thumbs/thumb-${counterFormatted}.jpeg`)
         console.log('CLICK!')
     })
 }
+
+
 
 async function increaseCounterAndGet() {
     let counter = await store.get('picture-counter')
@@ -45,6 +50,8 @@ async function increaseCounterAndGet() {
     return counter
 }
 
+
+
 function takePhoto(filename) {
     const cameraCommand = `
             libcamera-jpeg \\
@@ -54,36 +61,30 @@ function takePhoto(filename) {
                 --nopreview \\
                 --timeout 1
         `
-    exec(cameraCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`Doh! ${error.message}`)
-            return
+    execSync(cameraCommand)
+}
+
+
+
+function thumbnail(src, dest) {
+    sharp(src).resize(128, 128).toFile(dest, (err, info) => {
+        if (err) {
+            console.log(`Error while resizing file ${src}: ${err}`)
         }
-        if (stderr) {
-            console.log(`Doh! ${stderr}`)
-            return
+        if (info) {
+            console.log(info)
         }
-        console.log(stdout)
     })
 }
 
 
-async function thumbnail(src, dest) {
-    const image = await jimp.read(src)
-    await image.resize(128, 128)
-    await image.writeAsync(dest)
-}
 
 buttons.init().then(() => {
-    console.log("Yeah!")
+    console.log("... done. Ready to use - have fun!")
 })
 
 
 //const Ssd1351 = require('ssd1351').Ssd1351;
-const {exec} = require("child_process");
-const path = require("path");
-const Jimp = require("jimp");
-let timeOfLastUserAction = new Date();
 
 
 /*process.on('SIGINT', _ => {
@@ -93,6 +94,9 @@ let timeOfLastUserAction = new Date();
 
 //const oled = new Ssd1351();
 //oled.clearDisplay().then(r => console.log('CLR'))
+
+let timeOfLastUserAction = new Date()
+
 
 
 setInterval(async () => {
